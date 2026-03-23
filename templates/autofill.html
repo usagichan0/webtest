@@ -1,0 +1,95 @@
+{{define "title"}}オートフィルテスト{{end}}
+{{define "content"}}
+    <h1>オートフィル用テストページ</h1>
+    
+    <div class="section">
+        <h2>1. 通常のフォーム（ポスト時に内容表示）</h2>
+        <form action="/autofill" method="POST">
+            <div class="form-group">
+                <label for="username">ID (Username):</label>
+                <input type="text" id="username" name="username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" autocomplete="current-password">
+            </div>
+            <div class="form-group">
+                <label for="email">メールアドレス:</label>
+                <input type="email" id="email" name="email" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="address">住所:</label>
+                <input type="text" id="address" name="address" autocomplete="street-address">
+            </div>
+            <div class="form-group">
+                <label for="other">その他の情報:</label>
+                <input type="text" id="other" name="other">
+            </div>
+            <button type="submit">送信 (POST)</button>
+        </form>
+        
+        {{if .PostData}}
+        <div class="result" id="post-result">
+            <h3>送信された内容:</h3>
+            <ul>
+                {{range $key, $values := .PostData}}
+                <li><strong>{{$key}}:</strong> {{index $values 0}}</li>
+                {{end}}
+            </ul>
+        </div>
+        {{end}}
+    </div>
+
+    <div class="section">
+        <h2>2. 動的に ID, password が出現するページ</h2>
+        <button type="button" id="btn-dynamic-login">ID・パスワード入力欄を生成</button>
+        <form action="/autofill" method="POST" id="dynamic-login-form" style="display:none; margin-top:15px;">
+            <div id="dynamic-login-container" class="dynamic-wrapper"></div>
+            <button type="submit">送信 (POST)</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>3. 動的に メールアドレス が出現するページ</h2>
+        <button type="button" id="btn-dynamic-email">メールアドレス入力欄を生成</button>
+        <form action="/autofill" method="POST" id="dynamic-email-form" style="display:none; margin-top:15px;">
+            <div id="dynamic-email-container" class="dynamic-wrapper"></div>
+            <button type="submit">送信 (POST)</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('btn-dynamic-login').addEventListener('click', function() {
+            const container = document.getElementById('dynamic-login-container');
+            container.innerHTML = `
+                <div class="form-group">
+                    <label for="dyn_username">動的生成 ID:</label>
+                    <input type="text" id="dyn_username" name="dyn_username" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="dyn_password">動的生成 Password:</label>
+                    <input type="password" id="dyn_password" name="dyn_password" autocomplete="current-password">
+                </div>
+            `;
+            document.getElementById('dynamic-login-form').style.display = 'block';
+            this.style.display = 'none';
+        });
+
+        document.getElementById('btn-dynamic-email').addEventListener('click', function() {
+            const container = document.getElementById('dynamic-email-container');
+            container.innerHTML = `
+                <div class="form-group">
+                    <label for="dyn_email">動的生成 メールアドレス:</label>
+                    <input type="email" id="dyn_email" name="dyn_email" autocomplete="email">
+                </div>
+            `;
+            document.getElementById('dynamic-email-form').style.display = 'block';
+            this.style.display = 'none';
+        });
+        
+        // POST後スムーズスクロール
+        if (document.getElementById('post-result')) {
+            document.getElementById('post-result').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+{{end}}

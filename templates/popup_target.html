@@ -1,0 +1,22 @@
+{{define "title"}}ポップアップ先{{end}}
+{{define "content"}}
+    <div style="text-align:center; padding: 40px;">
+        <h2>ポップアップ先のページ</h2>
+        <p>このページは <code>window.open</code> から呼び出されました。</p>
+        <button onclick="window.close()" style="padding: 10px 20px;">このウィンドウを閉じる</button>
+    </div>
+    
+    <script>
+        // ポップアップ情報等を表示
+        const info = document.createElement('div');
+        info.style.marginTop = '20px';
+        info.style.color = '#555';
+        info.style.fontSize = '0.9em';
+        info.innerHTML = `
+            <p>window.name: <strong>${window.name}</strong></p>
+            <p>window.innerWidth: ${window.innerWidth}</p>
+            <p>window.innerHeight: ${window.innerHeight}</p>
+        `;
+        document.querySelector('.container').appendChild(info);
+    </script>
+{{end}}

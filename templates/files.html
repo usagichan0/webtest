@@ -1,0 +1,97 @@
+{{define "title"}}ファイル操作テスト{{end}}
+{{define "content"}}
+    <h1>ファイルアップロード・ダウンロードテスト</h1>
+
+    <div class="section">
+        <h2>1. ダミーファイルダウンロード</h2>
+        <p>サーバーサイドで動的に生成されたファイルをダウンロードします。</p>
+        <div style="display:flex; gap:10px;">
+            <button onclick="window.location.href='/download/zip'">ZIPファイル ダウンロード</button>
+            <button onclick="window.location.href='/download/pdf'">PDFファイル ダウンロード</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. 単一ファイルアップロード</h2>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" name="file-single" required>
+            </div>
+            <button type="submit">アップロード</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>3. 複数ファイルアップロード</h2>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" name="files-multiple" multiple required>
+            </div>
+            <button type="submit">複数アップロード</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>4. ドラッグ＆ドロップファイルアップロード</h2>
+        <div id="drop-zone" class="drop-zone">
+            <p>ここにファイルをドラッグ＆ドロップしてください</p>
+            <p style="font-size:0.8em; color:#95a5a6;">(複数ファイル可)</p>
+        </div>
+        <form id="dnd-form" action="/upload" method="POST" enctype="multipart/form-data" style="display:none;">
+            <input type="file" id="dnd-input" name="files-dnd" multiple>
+        </form>
+    </div>
+
+    {{if .UploadResults}}
+    <div class="section" id="upload-result">
+        <h2>アップロード結果</h2>
+        {{range .UploadResults}}
+        <div class="result" style="margin-bottom: 10px;">
+            <p><strong>ファイル名:</strong> {{.Filename}}</p>
+            <p><strong>Content-Type:</strong> {{.ContentType}}</p>
+            <p><strong>サイズ:</strong> {{.Size}} bytes</p>
+            <p><strong>先頭32バイト (HEX ASCII):</strong><br> <code style="display:block; background:#fff; padding:10px; border:1px solid #ccc; margin-top:5px; white-space:pre-wrap;">{{.HexDump}}</code></p>
+        </div>
+        {{end}}
+    </div>
+    <script>
+        document.getElementById('upload-result').scrollIntoView({ behavior: 'smooth' });
+    </script>
+    {{end}}
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const dndInput = document.getElementById('dnd-input');
+        const dndForm = document.getElementById('dnd-form');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                dndInput.files = files;
+                dndForm.submit();
+                dropZone.innerHTML = "<p>アップロード中...</p>";
+            }
+        }
+    </script>
+{{end}}

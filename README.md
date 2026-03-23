@@ -1,4 +1,4 @@
-# テスト用　Render.com 用 Go Web アプリケーション
+# Render.com 用 Go Web アプリケーション
 
 これは Render.com にデプロイするための最小構成の Go Web アプリケーションテストページです。
 

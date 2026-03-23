@@ -1,0 +1,44 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{template "title" .}} - Browser Test Pages</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #2c3e50; }
+        a { color: #3498db; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee; display: flex; gap: 15px; flex-wrap: wrap; }
+        .nav a { font-weight: bold; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, button, select, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box; }
+        button { background-color: #3498db; color: white; cursor: pointer; border: none; font-weight: bold; margin-top: 5px; width: auto; }
+        button:hover { background-color: #2980b9; }
+        .result, .info-box { margin-top: 15px; padding: 15px; background: #e8f8f5; border-left: 4px solid #1abc9c; word-break: break-all; overflow-wrap: break-word; }
+        .error { background: #fdf2e9; border-left: 4px solid #e67e22; color: #d35400; }
+        video { max-width: 100%; border: 1px solid #ddd; margin-top: 10px; background: #000; border-radius: 4px; }
+        canvas { border: 1px solid #ddd; margin-top: 10px; background: #222; max-width: 100%; border-radius: 4px; }
+        .section { margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+        .dynamic-wrapper { padding: 10px; border: 1px dashed #e6c200; background: #fffacd; margin-top: 10px; }
+        .drop-zone { border: 2px dashed #3498db; border-radius: 8px; padding: 40px; text-align: center; color: #7f8c8d; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
+        .drop-zone:hover, .drop-zone.dragover { background: #eaf2f8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">トップページ</a>
+            <a href="/autofill">オートフィルテスト</a>
+            <a href="/media">Web会議テスト</a>
+            <a href="/files">ファイル操作テスト</a>
+            <a href="/popups">ポップアップテスト</a>
+        </div>
+        {{template "content" .}}
+    </div>
+</body>
+</html>
+{{end}}

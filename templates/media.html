@@ -1,0 +1,137 @@
+{{define "title"}}Web会議用ページ{{end}}
+{{define "content"}}
+    <h1>Web会議関連APIテストページ</h1>
+
+    <div class="section">
+        <h2>1. マイクの有効化と情報・波形表示</h2>
+        <button id="btn-mic">マイクを有効化</button>
+        <div id="mic-info" class="info-box" style="display:none;"></div>
+        <canvas id="mic-canvas" width="600" height="150" style="display:none;"></canvas>
+    </div>
+
+    <div class="section">
+        <h2>2. Webカメラの有効化と情報・映像表示</h2>
+        <button id="btn-camera">カメラを有効化</button>
+        <div id="camera-info" class="info-box" style="display:none;"></div>
+        <video id="camera-video" autoplay playsinline muted style="display:none;"></video>
+    </div>
+
+    <div class="section">
+        <h2>3. 画面共有（情報と映像表示）</h2>
+        <button id="btn-screen">画面共有を開始</button>
+        <div id="screen-info" class="info-box" style="display:none;"></div>
+        <video id="screen-video" autoplay playsinline muted style="display:none;"></video>
+    </div>
+
+    <div class="section">
+        <h2>4. 音声出力テスト</h2>
+        <p>ストリーミング再生（Web Audio APIによる動的生成音、またはオーディオタグ）</p>
+        <button id="btn-audio">テスト音声を再生 (1秒間)</button>
+        <br><br>
+        <audio controls src="https://mdn.github.io/webaudio-examples/audio-basics/outfoxing.mp3" preload="none"></audio>
+    </div>
+
+    <script>
+        // マイクロフォン
+        document.getElementById('btn-mic').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const track = stream.getAudioTracks()[0];
+                const infoBox = document.getElementById('mic-info');
+                infoBox.style.display = 'block';
+                infoBox.innerHTML = `<strong>マイク情報:</strong><br>Label: ${track.label}<br>ID: ${track.id}<br>Muted: ${track.muted}<br>ReadyState: ${track.readyState}`;
+
+                // 波形表示
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioCtx.createMediaStreamSource(stream);
+                const analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 2048;
+                source.connect(analyser);
+
+                const canvas = document.getElementById('mic-canvas');
+                canvas.style.display = 'block';
+                const canvasCtx = canvas.getContext('2d');
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                function draw() {
+                    requestAnimationFrame(draw);
+                    analyser.getByteTimeDomainData(dataArray);
+                    canvasCtx.fillStyle = '#222';
+                    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+                    canvasCtx.lineWidth = 2;
+                    canvasCtx.strokeStyle = '#1abc9c';
+                    canvasCtx.beginPath();
+                    const sliceWidth = canvas.width * 1.0 / bufferLength;
+                    let x = 0;
+                    for(let i = 0; i < bufferLength; i++) {
+                        const v = dataArray[i] / 128.0;
+                        const y = v * canvas.height / 2;
+                        if(i === 0) { canvasCtx.moveTo(x, y); } else { canvasCtx.lineTo(x, y); }
+                        x += sliceWidth;
+                    }
+                    canvasCtx.lineTo(canvas.width, canvas.height/2);
+                    canvasCtx.stroke();
+                }
+                draw();
+            } catch (err) {
+                alert('マイクの取得に失敗しました: ' + err);
+            }
+        });
+
+        // カメラ
+        document.getElementById('btn-camera').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const track = stream.getVideoTracks()[0];
+                const settings = track.getSettings();
+                const infoBox = document.getElementById('camera-info');
+                infoBox.style.display = 'block';
+                infoBox.innerHTML = `<strong>カメラ情報:</strong><br>Label: ${track.label}<br>Resolution: ${settings.width}x${settings.height}<br>FrameRate: ${settings.frameRate}`;
+                
+                const video = document.getElementById('camera-video');
+                video.style.display = 'block';
+                video.srcObject = stream;
+            } catch (err) {
+                alert('カメラの取得に失敗しました: ' + err);
+            }
+        });
+
+        // 画面共有
+        document.getElementById('btn-screen').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+                const track = stream.getVideoTracks()[0];
+                const settings = track.getSettings();
+                const infoBox = document.getElementById('screen-info');
+                infoBox.style.display = 'block';
+                infoBox.innerHTML = `<strong>画面共有情報:</strong><br>Label: ${track.label}<br>DisplaySurface: ${settings.displaySurface}<br>Resolution: ${settings.width}x${settings.height}`;
+                
+                const video = document.getElementById('screen-video');
+                video.style.display = 'block';
+                video.srcObject = stream;
+            } catch (err) {
+                alert('画面共有の取得に失敗しました: ' + err);
+            }
+        });
+
+        // 音声出力
+        document.getElementById('btn-audio').addEventListener('click', () => {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
+            
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.1);
+            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 1);
+        });
+    </script>
+{{end}}

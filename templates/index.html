@@ -1,0 +1,41 @@
+{{define "title"}}トップページ{{end}}
+{{define "content"}}
+    <h1>ブラウザ機能機能テストページ</h1>
+    <p>以下のリンクから各機能のテストページへ移動してください。Render.comなどへのデプロイ時に使用できるGo言語のWebサーバー機能によって提供されています。</p>
+    
+    <div class="section">
+        <h2><a href="/autofill">オートフィル用テストページ</a></h2>
+        <ul>
+            <li>ポスト時に内容表示 (ID, パスワード, メールアドレス, 住所, その他の情報)</li>
+            <li>動的に ID, パスワード が出現するフォーム</li>
+            <li>動的に メールアドレス が出現するフォーム</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2><a href="/media">Web会議用ページ</a></h2>
+        <ul>
+            <li>マイク有効化と内容確認（情報表示、音声の波形表示）</li>
+            <li>Webカメラの有効化とカメラ内容確認（情報表示、映像表示）</li>
+            <li>画面共有（情報表示、映像表示）</li>
+            <li>音声出力（ストリーミング再生）</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2><a href="/files">ファイルアップロード・ダウンロード</a></h2>
+        <ul>
+            <li>ZIPファイル ダウンロード (動的生成)</li>
+            <li>PDFファイル ダウンロード (動的生成)</li>
+            <li>ファイルアップロード（単一、複数、ドラッグ＆ドロップ）</li>
+            <li>アップロード後のファイル情報（ファイル名、MIMEタイプ、先頭32バイトHEXASCII）表示</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2><a href="/popups">コンテンツ・JavaScriptテストページ</a></h2>
+        <ul>
+            <li><code>window.open</code> テストページ（各種 popup 状態等）</li>
+        </ul>
+    </div>
+{{end}}
